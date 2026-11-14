@@ -1,0 +1,27 @@
+---
+- name: Ensure dvwa stack directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ dvwa_stack_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Write dvwa compose definition
+  become: true
+  ansible.builtin.copy:
+    dest: "{{ dvwa_stack_dir }}/docker-compose.yml"
+    content: "{{ dvwa_compose_yml }}"
+    mode: '0644'
+
+- name: Run dvwa compose stack
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: "{{ dvwa_stack_dir }}"
+    state: present
+
+- name: Open dvwa port in UFW
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "{{ dvwa_port | string }}"
+    proto: tcp

@@ -1,8 +1,0 @@
----
-common_timezone: Europe/Paris
-common_base_packages:
-  - curl
-  - htop
-  - vim
-  - ufw
-  - chrony

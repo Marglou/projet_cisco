@@ -1,0 +1,7 @@
+---
+- name: Deploy DVWA stack
+  hosts: dvwa
+  gather_facts: false
+  roles:
+    - role: dvwa
+      tags: [dvwa]

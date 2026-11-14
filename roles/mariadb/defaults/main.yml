@@ -1,0 +1,28 @@
+---
+mariadb_stack_dir: "{{ docker_stacks_dir }}/mariadb"
+mariadb_port: 3306
+mariadb_database: dvwa
+mariadb_user: dvwa
+mariadb_password: dvwa
+mariadb_root_password: root
+mariadb_compose_yml: |
+  services:
+    mariadb:
+      image: mariadb:11
+      restart: unless-stopped
+      ports:
+        - "{{ mariadb_port }}:3306"
+      environment:
+        MARIADB_DATABASE: {{ mariadb_database }}
+        MARIADB_USER: {{ mariadb_user }}
+        MARIADB_PASSWORD: {{ mariadb_password }}
+        MARIADB_ROOT_PASSWORD: {{ mariadb_root_password }}
+      volumes:
+        - mariadb_data:/var/lib/mysql
+      networks:
+        - monitoring_net
+  volumes:
+    mariadb_data:
+  networks:
+    monitoring_net:
+      external: true

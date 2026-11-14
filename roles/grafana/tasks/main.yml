@@ -5,41 +5,31 @@
       - vault_grafana_admin_password is defined
       - vault_grafana_admin_password | length > 0
     fail_msg: >-
-      Define vault_grafana_admin_password in an ansible-vault
-      encrypted variable file.
+      Define vault_grafana_admin_password in an encrypted
+      inventory/group_vars/monitoring.vault file.
 
 - name: Ensure grafana stack directory exists
+  become: true
   ansible.builtin.file:
     path: "{{ grafana_stack_dir }}"
     state: directory
     mode: '0755'
 
-- name: Ensure datasource provisioning directory exists
-  ansible.builtin.file:
-    path: "{{ grafana_stack_dir }}/provisioning/datasources"
-    state: directory
-    mode: '0755'
-
-- name: Deploy grafana compose file
-  ansible.builtin.template:
-    src: docker-compose.yml.j2
+- name: Write grafana compose definition
+  become: true
+  ansible.builtin.copy:
     dest: "{{ grafana_stack_dir }}/docker-compose.yml"
+    content: "{{ grafana_compose_yml }}"
     mode: '0644'
-  notify: Restart grafana compose stack
 
-- name: Deploy grafana datasource provisioning file
-  ansible.builtin.template:
-    src: datasource.yml.j2
-    dest: "{{ grafana_stack_dir }}/provisioning/datasources/datasource.yml"
-    mode: '0644'
-  notify: Restart grafana compose stack
-
-- name: Start grafana compose stack
+- name: Run grafana compose stack
+  become: true
   community.docker.docker_compose_v2:
     project_src: "{{ grafana_stack_dir }}"
     state: present
 
-- name: Allow Grafana port in UFW
+- name: Open grafana port in UFW
+  become: true
   community.general.ufw:
     rule: allow
     port: "{{ grafana_port | string }}"

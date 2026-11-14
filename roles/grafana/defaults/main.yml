@@ -1,8 +1,28 @@
 ---
 grafana_stack_dir: "{{ docker_stacks_dir }}/grafana"
-grafana_image: grafana/grafana-oss
-grafana_container_name: grafana
 grafana_port: 3000
 grafana_admin_user: admin
-grafana_domain: localhost
 grafana_root_url: "%(protocol)s://%(domain)s/grafana/"
+grafana_domain: localhost
+grafana_compose_yml: |
+  services:
+    grafana:
+      image: grafana/grafana-oss
+      restart: unless-stopped
+      ports:
+        - "{{ grafana_port }}:3000"
+      environment:
+        GF_SECURITY_ADMIN_USER: {{ grafana_admin_user }}
+        GF_SECURITY_ADMIN_PASSWORD: {{ vault_grafana_admin_password }}
+        GF_SERVER_ROOT_URL: {{ grafana_root_url }}
+        GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+        GF_SERVER_DOMAIN: {{ grafana_domain }}
+      volumes:
+        - grafana_data:/var/lib/grafana
+      networks:
+        - monitoring_net
+  volumes:
+    grafana_data:
+  networks:
+    monitoring_net:
+      external: true

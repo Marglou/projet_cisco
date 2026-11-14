@@ -1,7 +1,0 @@
----
-suricata_stack_dir: "{{ docker_stacks_dir }}/suricata"
-suricata_image: jasonish/suricata
-suricata_container_name: suricata
-suricata_interface: enp0s8
-suricata_home_net: "[192.168.56.0/24]"
-suricata_log_dir: /var/log/suricata

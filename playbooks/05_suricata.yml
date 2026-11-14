@@ -1,7 +1,0 @@
----
-- name: Deploy Suricata stack
-  hosts: ids
-  become: true
-  tags: [suricata]
-  roles:
-    - role: suricata

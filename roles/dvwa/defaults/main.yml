@@ -1,0 +1,15 @@
+---
+dvwa_stack_dir: "{{ docker_stacks_dir }}/dvwa"
+dvwa_port: 8080
+dvwa_compose_yml: |
+  services:
+    dvwa:
+      image: vulnerables/web-dvwa
+      restart: unless-stopped
+      ports:
+        - "{{ dvwa_port }}:80"
+      networks:
+        - monitoring_net
+  networks:
+    monitoring_net:
+      external: true

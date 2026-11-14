@@ -1,0 +1,7 @@
+---
+- name: Configure SSH baseline
+  hosts: new_vms:docker_hosts
+  gather_facts: true
+  roles:
+    - role: ssh
+      tags: [ssh]

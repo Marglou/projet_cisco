@@ -1,63 +1,67 @@
-# projet_cisco - minimal Ansible infrastructure
+# projet_cisco - basecode Ansible lab
 
-This repository contains a minimal, idempotent Ansible project to:
-- create Ubuntu 22.04 VirtualBox VMs from a template snapshot,
-- apply baseline hardening,
-- install Docker Engine and Compose plugin,
-- deploy NGINX, Grafana, and Suricata using Docker Compose.
+Minimal Ansible basecode for WSL2/VS Code automation of Ubuntu 22.04 VirtualBox VMs,
+with Docker Compose services split into simple roles.
+
+## Basecode layout
+
+- Single inventory file: `inventory/inventory.yml`
+- Roles keep only `defaults/main.yml` and `tasks/main.yml` (no role `meta/` files)
+- Service roles requested in this basecode:
+  - `ssh`
+  - `docker_compose`
+  - `nginx`
+  - `grafana`
+  - `prometheus`
+  - `mariadb`
+  - `dvwa`
+- VM lifecycle role: `vbox_vm`
 
 ## Quick start
 
 ```bash
 ansible-galaxy collection install -r requirements.yml
-ansible-playbook playbooks/00_create_vms.yml
+ansible-playbook playbooks/00_create_vm.yml
 ansible-playbook playbooks/site.yml --ask-vault-pass
 ```
 
-## SSH keys
+## Inventory
 
-Never commit a private key.
+Edit `inventory/inventory.yml` and place hosts into groups (`docker_hosts`, `nginx`,
+`grafana`, `prometheus`, `mariadb`, `dvwa`, `ssh`, `new_vms`).
 
-Generate a dedicated key pair outside this repository:
+## SSH key
+
+Never commit private keys.
 
 ```bash
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_ansible
 ```
 
-The public key placeholder is at:
-- `roles/vbox_vm/files/id_ed25519_ansible.pub`
+Private key path is configured in `inventory/group_vars/all.yml`.
 
-Set private key path in `inventory/group_vars/all.yml`:
-- `ansible_ssh_private_key_file: "~/.ssh/id_ed25519_ansible"`
+## Template VM preparation
 
-## Prepare the template VM
+Before creating a `base` snapshot, install in the template VM:
 
-Prepare your Ubuntu 22.04 template VM before snapshotting:
-- install `openssh-server`, `python3`, `sudo`, `virtualbox-guest-utils`
-- create an automation user with sudo NOPASSWD
-- append your public key to `~/.ssh/authorized_keys`
-- use host-only or bridged networking (not NAT-only)
-- create a snapshot named `base`
+- `openssh-server`
+- `python3`
+- `sudo`
+- `virtualbox-guest-utils`
 
-## Vault secrets
+Ensure your Ansible user has sudo NOPASSWD and your public key in
+`~/.ssh/authorized_keys`.
 
-Create your encrypted variable file from the example:
+## Vault
 
 ```bash
 cp inventory/group_vars/monitoring.vault.example inventory/group_vars/monitoring.vault
 ansible-vault encrypt inventory/group_vars/monitoring.vault
 ```
 
-Expected secret variable:
-- `vault_grafana_admin_password`
+Set `vault_grafana_admin_password` in the vault file.
 
-## VirtualBox VM lifecycle
+## WSL2 networking tip
 
-Role `vbox_vm` supports:
-- `vbox_vm_state: present` (clone/start/wait for SSH)
-- `vbox_vm_state: absent` (poweroff/delete)
-
-## WSL2 networking note
-
-If VM IPs are unreachable from WSL2, enable mirrored networking mode in your Windows
-`.wslconfig`, then restart WSL.
+If VM IPs are unreachable from WSL2, enable mirrored mode in `.wslconfig` and restart
+WSL.
