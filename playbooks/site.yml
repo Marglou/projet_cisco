@@ -1,0 +1,17 @@
+---
+- name: Create VMs
+  import_playbook: 00_create_vm.yml
+- name: Configure SSH
+  import_playbook: 01_ssh.yml
+- name: Install Docker + Compose
+  import_playbook: 02_docker_compose.yml
+- name: Deploy NGINX
+  import_playbook: 03_nginx.yml
+- name: Deploy Grafana
+  import_playbook: 04_grafana.yml
+- name: Deploy Prometheus
+  import_playbook: 05_prometheus.yml
+- name: Deploy MariaDB
+  import_playbook: 06_mariadb.yml
+- name: Deploy DVWA
+  import_playbook: 07_dvwa.yml

@@ -1,0 +1,12 @@
+---
+- name: Power off running VM
+  ansible.builtin.command:
+    argv: ["{{ vbox_bin }}", "controlvm", "{{ vm.name }}", "poweroff"]
+  when: ('"' ~ vm.name ~ '"') in vbox_running_vms.stdout
+  changed_when: true
+
+- name: Unregister and delete VM
+  ansible.builtin.command:
+    argv: ["{{ vbox_bin }}", "unregistervm", "{{ vm.name }}", "--delete"]
+  when: ('"' ~ vm.name ~ '"') in vbox_registered_vms.stdout
+  changed_when: true

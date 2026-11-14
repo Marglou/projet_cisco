@@ -1,0 +1,7 @@
+---
+- name: Deploy MariaDB stack
+  hosts: mariadb
+  gather_facts: false
+  roles:
+    - role: mariadb
+      tags: [mariadb]

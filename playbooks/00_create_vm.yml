@@ -1,0 +1,7 @@
+---
+- name: Create or delete VirtualBox VMs
+  hosts: localhost
+  gather_facts: false
+  tags: [vbox_vm]
+  roles:
+    - role: vbox_vm

@@ -1,0 +1,15 @@
+---
+# Full path to VBoxManage.exe from WSL
+# noqa: var-naming[no-role-prefix]
+vbox_bin: "/mnt/c/Program Files/Oracle/VirtualBox/VBoxManage.exe"
+# Template VM name used for linked clone
+# noqa: var-naming[no-role-prefix]
+vbox_template: ubuntu-2204-template
+# Snapshot used for linked clone
+# noqa: var-naming[no-role-prefix]
+vbox_snapshot: base
+# Desired state for managed VMs: present or absent
+vbox_vm_state: present
+# VMs to manage
+# noqa: var-naming[no-role-prefix]
+vbox_vms: []

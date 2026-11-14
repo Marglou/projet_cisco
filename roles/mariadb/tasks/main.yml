@@ -1,0 +1,27 @@
+---
+- name: Ensure mariadb stack directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ mariadb_stack_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Write mariadb compose definition
+  become: true
+  ansible.builtin.copy:
+    dest: "{{ mariadb_stack_dir }}/docker-compose.yml"
+    content: "{{ mariadb_compose_yml }}"
+    mode: '0644'
+
+- name: Run mariadb compose stack
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: "{{ mariadb_stack_dir }}"
+    state: present
+
+- name: Open mariadb port in UFW
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "{{ mariadb_port | string }}"
+    proto: tcp

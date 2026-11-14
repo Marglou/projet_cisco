@@ -1,0 +1,60 @@
+---
+- name: Install Docker repository prerequisites
+  become: true
+  ansible.builtin.apt:
+    name: [ca-certificates, curl, gnupg]
+    state: present
+    update_cache: true
+
+- name: Ensure Docker keyring directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ docker_compose_apt_keyring_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Download Docker apt GPG key
+  become: true
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: "{{ docker_compose_apt_key_path }}"
+    mode: '0644'
+
+- name: Configure Docker apt repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "{{ docker_compose_apt_repo }}"
+    filename: docker
+    state: present
+
+- name: Install Docker engine and compose plugin
+  become: true
+  ansible.builtin.apt:
+    name: "{{ docker_compose_packages }}"
+    state: present
+    update_cache: true
+
+- name: Ensure Docker service is enabled
+  become: true
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Add deployment user to docker group
+  become: true
+  ansible.builtin.user:
+    name: "{{ docker_compose_user }}"
+    groups: docker
+    append: true
+
+- name: Ensure shared external docker network exists
+  become: true
+  community.docker.docker_network:
+    name: "{{ docker_compose_network }}"
+    state: present
+
+- name: Verify Docker Compose plugin availability
+  ansible.builtin.command:
+    argv: [docker, compose, version]
+  changed_when: false

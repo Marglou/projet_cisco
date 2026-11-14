@@ -1,0 +1,7 @@
+---
+- name: Deploy Prometheus stack
+  hosts: prometheus
+  gather_facts: false
+  roles:
+    - role: prometheus
+      tags: [prometheus]

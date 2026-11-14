@@ -1,0 +1,34 @@
+---
+- name: Ensure nginx stack directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ nginx_stack_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Write nginx compose definition
+  become: true
+  ansible.builtin.copy:
+    dest: "{{ nginx_stack_dir }}/docker-compose.yml"
+    content: "{{ nginx_compose_yml }}"
+    mode: '0644'
+
+- name: Run nginx compose stack
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: "{{ nginx_stack_dir }}"
+    state: present
+
+- name: Open nginx HTTP port in UFW
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "{{ nginx_http_port | string }}"
+    proto: tcp
+
+- name: Open nginx HTTPS port in UFW
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "{{ nginx_https_port | string }}"
+    proto: tcp

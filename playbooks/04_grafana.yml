@@ -1,0 +1,7 @@
+---
+- name: Deploy Grafana stack
+  hosts: grafana
+  gather_facts: false
+  roles:
+    - role: grafana
+      tags: [grafana]

@@ -1,0 +1,17 @@
+---
+nginx_stack_dir: "{{ docker_stacks_dir }}/nginx"
+nginx_http_port: 80
+nginx_https_port: 443
+nginx_compose_yml: |
+  services:
+    nginx:
+      image: nginx:stable
+      restart: unless-stopped
+      ports:
+        - "{{ nginx_http_port }}:80"
+        - "{{ nginx_https_port }}:443"
+      networks:
+        - monitoring_net
+  networks:
+    monitoring_net:
+      external: true

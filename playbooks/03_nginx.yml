@@ -1,0 +1,7 @@
+---
+- name: Deploy NGINX stack
+  hosts: nginx
+  gather_facts: false
+  roles:
+    - role: nginx
+      tags: [nginx]

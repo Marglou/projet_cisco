@@ -1,0 +1,14 @@
+# SSH private keys
+**/id_rsa
+**/id_ecdsa
+**/id_ed25519
+*.pem
+
+# Ansible
+*.retry
+.vault_pass
+*.vault
+
+# Python / misc
+__pycache__/
+*.pyc

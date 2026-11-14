@@ -1,0 +1,5 @@
+---
+ansible_user: ansible
+ansible_ssh_private_key_file: "~/.ssh/id_ed25519_ansible"
+docker_stacks_dir: /opt/stacks
+vbox_bin: "/mnt/c/Program Files/Oracle/VirtualBox/VBoxManage.exe"
