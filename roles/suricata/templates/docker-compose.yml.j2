@@ -1,0 +1,15 @@
+services:
+  suricata:
+    container_name: {{ suricata_container_name }}
+    image: {{ suricata_image }}
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    command: ["-i", "{{ suricata_interface }}", "-c", "/etc/suricata/suricata.yaml"]
+    volumes:
+      - ./suricata.yaml:/etc/suricata/suricata.yaml:ro
+      - ./rules:/var/lib/suricata/rules
+      - {{ suricata_log_dir }}:/var/log/suricata

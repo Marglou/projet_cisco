@@ -1,0 +1,26 @@
+---
+- name: List registered VMs
+  ansible.builtin.command:
+    argv: ["{{ vbox_bin }}", "list", "vms"]
+  register: vbox_registered_vms
+  changed_when: false
+
+- name: List running VMs
+  ansible.builtin.command:
+    argv: ["{{ vbox_bin }}", "list", "runningvms"]
+  register: vbox_running_vms
+  changed_when: false
+
+- name: Ensure requested VMs are absent
+  ansible.builtin.include_tasks: absent.yml
+  loop: "{{ vbox_vms }}"
+  loop_control:
+    loop_var: vm
+  when: vbox_vm_state == 'absent'
+
+- name: Ensure requested VMs are present
+  ansible.builtin.include_tasks: present.yml
+  loop: "{{ vbox_vms }}"
+  loop_control:
+    loop_var: vm
+  when: vbox_vm_state == 'present'

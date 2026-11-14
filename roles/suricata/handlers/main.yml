@@ -1,0 +1,6 @@
+---
+- name: Restart suricata compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ suricata_stack_dir }}"
+    state: present
+    recreate: always

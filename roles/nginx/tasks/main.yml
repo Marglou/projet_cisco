@@ -1,0 +1,51 @@
+---
+- name: Ensure nginx stack directory exists
+  ansible.builtin.file:
+    path: "{{ nginx_stack_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Deploy nginx compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ nginx_stack_dir }}/docker-compose.yml"
+    mode: '0644'
+  notify: Restart nginx compose stack
+
+- name: Deploy nginx main config
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_stack_dir }}/nginx.conf"
+    mode: '0644'
+  notify: Restart nginx compose stack
+
+- name: Deploy nginx site config
+  ansible.builtin.template:
+    src: default.conf.j2
+    dest: "{{ nginx_stack_dir }}/default.conf"
+    mode: '0644'
+  notify: Restart nginx compose stack
+
+- name: Deploy static index page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ nginx_stack_dir }}/index.html"
+    mode: '0644'
+  notify: Restart nginx compose stack
+
+- name: Start nginx compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ nginx_stack_dir }}"
+    state: present
+
+- name: Allow HTTP port in UFW
+  community.general.ufw:
+    rule: allow
+    port: "{{ nginx_http_port | string }}"
+    proto: tcp
+
+- name: Allow HTTPS port in UFW
+  community.general.ufw:
+    rule: allow
+    port: "{{ nginx_https_port | string }}"
+    proto: tcp

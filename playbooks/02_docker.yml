@@ -1,0 +1,7 @@
+---
+- name: Install Docker engine and compose plugin
+  hosts: docker_hosts
+  become: true
+  tags: [docker]
+  roles:
+    - role: docker

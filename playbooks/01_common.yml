@@ -1,0 +1,7 @@
+---
+- name: Configure common system settings
+  hosts: new_vms:docker_hosts
+  become: true
+  tags: [common]
+  roles:
+    - role: common

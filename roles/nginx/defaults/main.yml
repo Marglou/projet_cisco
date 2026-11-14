@@ -1,0 +1,7 @@
+---
+nginx_stack_dir: "{{ docker_stacks_dir }}/nginx"
+nginx_container_name: nginx
+nginx_image: nginx:stable
+nginx_http_port: 80
+nginx_https_port: 443
+nginx_server_name: _

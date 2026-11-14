@@ -1,0 +1,7 @@
+---
+- name: Deploy NGINX stack
+  hosts: web
+  become: true
+  tags: [nginx]
+  roles:
+    - role: nginx

@@ -1,0 +1,68 @@
+---
+- name: Clone VM from template snapshot
+  ansible.builtin.command:
+    argv:
+      - "{{ vbox_bin }}"
+      - clonevm
+      - "{{ vbox_template }}"
+      - --snapshot
+      - "{{ vbox_snapshot }}"
+      - --options
+      - link
+      - --name
+      - "{{ vm.name }}"
+      - --register
+  when: ('"' ~ vm.name ~ '"') not in vbox_registered_vms.stdout
+  changed_when: true
+
+- name: Configure VM resources
+  ansible.builtin.command:
+    argv:
+      - "{{ vbox_bin }}"
+      - modifyvm
+      - "{{ vm.name }}"
+      - --cpus
+      - "{{ vm.cpus | default(2) | string }}"
+      - --memory
+      - "{{ vm.memory | default(2048) | string }}"
+  changed_when: true
+
+- name: Start VM when not already running
+  ansible.builtin.command:
+    argv:
+      - "{{ vbox_bin }}"
+      - startvm
+      - "{{ vm.name }}"
+      - --type
+      - headless
+  when: ('"' ~ vm.name ~ '"') not in vbox_running_vms.stdout
+  changed_when: true
+
+- name: Wait until VM reports an IPv4 address
+  ansible.builtin.command:
+    argv:
+      - "{{ vbox_bin }}"
+      - guestproperty
+      - get
+      - "{{ vm.name }}"
+      - /VirtualBox/GuestInfo/Net/0/V4/IP
+  register: vbox_guest_ip
+  changed_when: false
+  until: >-
+    vbox_guest_ip.stdout is match(
+    '^Value\\: [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$')
+  retries: 40
+  delay: 5
+
+- name: Add VM to dynamic inventory groups
+  ansible.builtin.add_host:
+    name: "{{ vm.name }}"
+    groups: "{{ (vm.groups | default([])) + ['new_vms'] }}"
+    ansible_host: "{{ vbox_guest_ip.stdout | regex_replace('^Value\\: ', '') }}"
+    ansible_user: "{{ ansible_user }}"
+    ansible_ssh_private_key_file: "{{ ansible_ssh_private_key_file }}"
+
+- name: Wait for SSH availability on VM
+  ansible.builtin.wait_for_connection:
+    timeout: 300
+  delegate_to: "{{ vm.name }}"
